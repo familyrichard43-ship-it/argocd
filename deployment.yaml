@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: nginx:1.25
+        image: ghcr.io/familyrichard43-ship-it/mon-nginx:e936912eacdae9131663107dca5ac9d6133125ac
         ports:
         - containerPort: 80
 ---
