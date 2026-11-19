@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: mon-nginx
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: nginx
@@ -29,3 +29,4 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
+3
