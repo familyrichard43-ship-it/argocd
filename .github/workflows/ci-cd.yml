@@ -1,0 +1,42 @@
+name: Build et mise a jour GitOps
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'index.html'
+      - 'Dockerfile'
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Connexion au registre GitHub (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build et Push de l'image Docker
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/familyrichard43-ship-it/mon-nginx:${{ github.sha }}
+
+      - name: Mettre à jour le tag dans deployment.yaml
+        run: |
+          sed -i "s|image: .*|image: ghcr.io/familyrichard43-ship-it/mon-nginx:${{ github.sha }}|g" deployment.yaml
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add deployment.yaml
+          git commit -m "ci: deploiement image ${{ github.sha }}"
+          git push
